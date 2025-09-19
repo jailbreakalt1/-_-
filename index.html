@@ -24,7 +24,6 @@
     body {
       margin: 0;
       overflow: hidden;
-      background: transparent;
     }
     canvas {
       position: fixed;
@@ -274,10 +273,10 @@
   ui.addEventListener("click", () => {
     if (song.paused) {
       song.play();
-      text.innerText = "PAUSE MUSIC";
+      text.innerText = "PLAY MUSIC";
     } else {
       song.pause();
-      text.innerText = "PLAY MUSIC";
+      text.innerText = "PAUSE MUSIC";
     }
     ui.style.opacity = 1;
     setTimeout(() => {
