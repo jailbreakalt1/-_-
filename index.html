@@ -2,11 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>to Trish🌹 from Ryan</title>
   <link rel="stylesheet" href="./style.css">
   <style>
-    /* your carousel styles */
     .carousel-video {
       width: 100%;
       height: 100%;
@@ -21,7 +20,12 @@
       overflow: hidden;
     }
 
-    /* heart button styles */
+    /* New styles for the heart animation and music button */
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: transparent;
+    }
     canvas {
       position: fixed;
       top: 0;
@@ -39,8 +43,7 @@
       color: white;
       font-size: 18px;
       opacity: 0;
-      transition: opacity 0.6s ease;
-      z-index: 10;
+      transition: opacity 0.6s ease, transform 0.6s ease;
     }
     #text {
       background: rgba(0,0,0,0.6);
@@ -133,21 +136,22 @@
       <img src="./images/7.jpg"/>
     </div>
   </div>
+</div>
 
-  <div class="carousel-item">
+<div class="carousel-item">
     <div class="carousel-box">
       <div class="title">my forever💞</div>
       <div class="num">11</div>
       <img src="./images/n.jpg"/>
     </div>
   </div>
+</div>
 
-  <div class="carousel-item">
+<div class="carousel-item">
     <div class="carousel-box">
       <div class="title">I love You♥️</div>
       <div class="num">12</div>
     </div>
-  </div>
 </div>
 
 <div class="layout">
@@ -157,12 +161,15 @@
 <div class="cursor"></div>
 <div class="cursor cursor2"></div>
 
-<!-- Heart Button -->
 <canvas id="heartCanvas"></canvas>
+
 <audio id="song" autoplay loop>
   <source src="images/Pink Sweat_ - At My Worst (feat. Kehlani) [Official Video] [K_zylJH4PRI].mp3" type="audio/mpeg">
 </audio>
-<div id="ui"><div id="text">PAUSE MUSIC</div></div>
+
+<div id="ui">
+  <div id="text">PAUSE MUSIC</div>
+</div>
 
 <script src="./script.js"></script>
 
@@ -182,15 +189,17 @@
   const centerY = canvas.height / 2;
   const size = 140;
 
+  // Heart equation for interior fill
   function heartEquation(t, r) {
     let x = size * r * 16 * Math.pow(Math.sin(t), 3);
     let y = -size * r * (13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
     return { x, y };
   }
 
+  // Create filled heart particles
   for (let i = 0; i < particleCount; i++) {
     let t = Math.random() * Math.PI * 2;
-    let r = Math.random();
+    let r = Math.random(); // radius factor to fill inside
     let { x, y } = heartEquation(t, r);
 
     particles.push({
@@ -207,14 +216,13 @@
 
   let startTime = null;
   let formed = false;
+  let smallMode = false;
   let beating = false;
 
   function animate(timestamp) {
     if (!startTime) startTime = timestamp;
-    const progress = Math.min((timestamp - startTime) / 3000, 1);
+    const progress = Math.min((timestamp - startTime) / 3000, 1); // 3s to form
 
-    // reset transform each frame
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     for (let p of particles) {
@@ -235,7 +243,7 @@
       formed = true;
       setTimeout(() => {
         shrinkAndMove();
-      }, 2000);
+      }, 2000); // wait 2s after full formation
     }
 
     if (beating) {
@@ -245,8 +253,12 @@
     requestAnimationFrame(animate);
   }
 
+  // Shrink & move heart
   function shrinkAndMove() {
-    ui.style.opacity = 1;
+    smallMode = true;
+    ui.style.opacity = 1; // reveal text
+
+    // After 3s fade text back in
     setTimeout(() => {
       ui.style.opacity = 0;
       beating = true;
@@ -255,9 +267,10 @@
 
   function beatHeart() {
     let scale = 1 + 0.05 * Math.sin(Date.now() / 150);
-    ctx.setTransform(scale, 0, 0, scale, canvas.width - 100, canvas.height - 100);
+    ctx.setTransform(scale, 0, 0, scale, canvas.width - 80, canvas.height - 80);
   }
 
+  // Toggle music on click
   ui.addEventListener("click", () => {
     if (song.paused) {
       song.play();
@@ -274,5 +287,6 @@
 
   animate();
 </script>
+
 </body>
 </html>
