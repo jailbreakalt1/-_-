@@ -8,26 +8,6 @@
 </head>
 <body>
 	
-<style>
-  body { margin:0; background:#111; height:100vh; display:flex; align-items:center; justify-content:center; }
-  canvas { cursor:pointer; }
-  .label {
-    position:absolute; top:50%; left:50%;
-    transform:translate(-50%, -50%) translateY(120px);
-    padding:8px 16px; border-radius:999px;
-    background:rgba(0,0,0,0.6); color:#fff; font-weight:600;
-    opacity:0; transition:opacity 0.3s, transform 0.3s;
-    backdrop-filter:blur(5px);
-    white-space:nowrap;
-  }
-  .label.show { opacity:1; transform:translate(-50%, -50%) translateY(100px); }
-</style>
-
-<canvas id="heartCanvas"></canvas>
-<div id="label" class="label">PAUSE MUSIC</div>
-
-<audio id="song" autoplay src="images/Pink Sweat_ - At My Worst (feat. Kehlani) [Official Video] [K_zylJH4PRI].mp3"></audio>
-
 <script>
 const canvas = document.getElementById("heartCanvas");
 const ctx = canvas.getContext("2d");
@@ -36,20 +16,18 @@ const song = document.getElementById("song");
 
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
-const cx = canvas.width/2, cy = canvas.height/2;
+let cx = canvas.width/2, cy = canvas.height/2;
 
-const PARTICLES = 800;       // denser fill
-const SIZE = 15;             // heart size scale
+const PARTICLES = 800;
+const SIZE = 15;
 const DURATION = 8000;
 
-// parametric heart curve
 function heartPoint(t, scale=SIZE) {
   let x = 16*Math.pow(Math.sin(t),3);
   let y = 13*Math.cos(t) - 5*Math.cos(2*t) - 2*Math.cos(3*t) - Math.cos(4*t);
   return {x:x*scale, y:-y*scale};
 }
 
-// get random start from outside screen
 function randomStart() {
   const side = Math.floor(Math.random()*4);
   const w = canvas.width, h = canvas.height, m = 200;
@@ -59,13 +37,12 @@ function randomStart() {
   return {x:-m,y:Math.random()*h};
 }
 
-// particles
+// Particles setup
 let particles=[];
 for(let i=0;i<PARTICLES;i++){
   let t = Math.random()*Math.PI*2;
   let outline = heartPoint(t);
-  // scale inward toward center for fill
-  let s = Math.pow(Math.random(),0.5); // bias toward center
+  let s = Math.pow(Math.random(),0.5);
   let target = { x: outline.x*s, y: outline.y*s };
   let start = randomStart();
   particles.push({
@@ -79,10 +56,54 @@ for(let i=0;i<PARTICLES;i++){
 }
 
 let startTime=null;
+let heartSettledTime = null;
+let heartIsSettled = false;
+let heartShrinkStarted = false;
+let heartShrinkStartTime = null;
+
+let heartScale = 1;
+let heartOffsetX = 0, heartOffsetY = 0;
+
 function animate(time){
   if(!startTime) startTime=time;
   let elapsed=time-startTime;
   ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  // Check if all particles settled
+  if (!heartIsSettled) {
+    let allDone = true;
+    for(let p of particles){
+      let local=elapsed-p.delay;
+      let prog=Math.min(Math.max(local/p.time,0),1);
+      if(prog<1) { allDone = false; break; }
+    }
+    if (allDone) {
+      heartIsSettled = true;
+      heartSettledTime = time;
+    }
+  }
+
+  // After 2s of settling, begin shrink/move
+  if (heartIsSettled && !heartShrinkStarted && time - heartSettledTime > 2000) {
+    heartShrinkStarted = true;
+    heartShrinkStartTime = time;
+  }
+
+  // Animate shrink and move
+  if (heartShrinkStarted) {
+    let t = Math.min((time - heartShrinkStartTime) / 1200, 1); // 1.2s transition
+    // Shrink to 0.25x, move to bottom right
+    heartScale = 1 - t * 0.75;
+    // Bottom right margin
+    let offsetX = (canvas.width/2 - 120) - cx;
+    let offsetY = (canvas.height/2 - 120) - cy;
+    heartOffsetX = t * offsetX;
+    heartOffsetY = t * offsetY;
+  } else {
+    heartScale = 1;
+    heartOffsetX = 0;
+    heartOffsetY = 0;
+  }
 
   for(let p of particles){
     let local=elapsed-p.delay;
@@ -90,13 +111,18 @@ function animate(time){
     let ease=1-Math.pow(1-prog,3);
     let x=p.sx+(p.tx-p.sx)*ease;
     let y=p.sy+(p.ty-p.sy)*ease;
-    if(prog>=1){ // shiver + flicker
+    if(prog>=1){
       x+=Math.sin(time*0.005+p.phase)*1.5;
       y+=Math.cos(time*0.004+p.phase)*1.5;
     }
     let alpha=0.7+0.3*Math.sin(time*0.005+p.phase);
+
+    // Apply heart move/scale
+    let drawX = (x - cx) * heartScale + cx + heartOffsetX;
+    let drawY = (y - cy) * heartScale + cy + heartOffsetY;
+
     ctx.beginPath();
-    ctx.arc(x,y,2.3,0,Math.PI*2);
+    ctx.arc(drawX, drawY, 2.3 * heartScale, 0, Math.PI*2);
     ctx.fillStyle=(p.color==="cyan")?`rgba(0,255,255,${alpha})`:`rgba(255,70,100,${alpha})`;
     ctx.fill();
   }
@@ -104,7 +130,6 @@ function animate(time){
 }
 animate();
 
-// click toggles music
 canvas.addEventListener("click",()=>{
   if(song.paused){ song.play(); showLabel("PAUSE MUSIC"); }
   else { song.pause(); showLabel("PLAY MUSIC"); }
