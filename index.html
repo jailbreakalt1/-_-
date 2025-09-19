@@ -9,6 +9,116 @@
 <body>
 	
 <style>
+  body { margin:0; background:#111; height:100vh; display:flex; align-items:center; justify-content:center; }
+  canvas { cursor:pointer; }
+  .label {
+    position:absolute; top:50%; left:50%;
+    transform:translate(-50%, -50%) translateY(120px);
+    padding:8px 16px; border-radius:999px;
+    background:rgba(0,0,0,0.6); color:#fff; font-weight:600;
+    opacity:0; transition:opacity 0.3s, transform 0.3s;
+    backdrop-filter:blur(5px);
+    white-space:nowrap;
+  }
+  .label.show { opacity:1; transform:translate(-50%, -50%) translateY(100px); }
+</style>
+
+<canvas id="heartCanvas"></canvas>
+<div id="label" class="label">PAUSE MUSIC</div>
+
+<audio id="song" autoplay src="images/Pink Sweat_ - At My Worst (feat. Kehlani) [Official Video] [K_zylJH4PRI].mp3"></audio>
+
+<script>
+const canvas = document.getElementById("heartCanvas");
+const ctx = canvas.getContext("2d");
+const label = document.getElementById("label");
+const song = document.getElementById("song");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+const cx = canvas.width/2, cy = canvas.height/2;
+
+const PARTICLES = 800;       // denser fill
+const SIZE = 15;             // heart size scale
+const DURATION = 8000;
+
+// parametric heart curve
+function heartPoint(t, scale=SIZE) {
+  let x = 16*Math.pow(Math.sin(t),3);
+  let y = 13*Math.cos(t) - 5*Math.cos(2*t) - 2*Math.cos(3*t) - Math.cos(4*t);
+  return {x:x*scale, y:-y*scale};
+}
+
+// get random start from outside screen
+function randomStart() {
+  const side = Math.floor(Math.random()*4);
+  const w = canvas.width, h = canvas.height, m = 200;
+  if (side===0) return {x:Math.random()*w,y:-m};
+  if (side===1) return {x:w+m,y:Math.random()*h};
+  if (side===2) return {x:Math.random()*w,y:h+m};
+  return {x:-m,y:Math.random()*h};
+}
+
+// particles
+let particles=[];
+for(let i=0;i<PARTICLES;i++){
+  let t = Math.random()*Math.PI*2;
+  let outline = heartPoint(t);
+  // scale inward toward center for fill
+  let s = Math.pow(Math.random(),0.5); // bias toward center
+  let target = { x: outline.x*s, y: outline.y*s };
+  let start = randomStart();
+  particles.push({
+    sx:start.x, sy:start.y,
+    tx:cx+target.x, ty:cy+target.y,
+    color:Math.random()>0.5?"cyan":"red",
+    delay:Math.random()*DURATION*0.5,
+    time:DURATION*(0.5+Math.random()*0.5),
+    phase:Math.random()*Math.PI*2
+  });
+}
+
+let startTime=null;
+function animate(time){
+  if(!startTime) startTime=time;
+  let elapsed=time-startTime;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  for(let p of particles){
+    let local=elapsed-p.delay;
+    let prog=Math.min(Math.max(local/p.time,0),1);
+    let ease=1-Math.pow(1-prog,3);
+    let x=p.sx+(p.tx-p.sx)*ease;
+    let y=p.sy+(p.ty-p.sy)*ease;
+    if(prog>=1){ // shiver + flicker
+      x+=Math.sin(time*0.005+p.phase)*1.5;
+      y+=Math.cos(time*0.004+p.phase)*1.5;
+    }
+    let alpha=0.7+0.3*Math.sin(time*0.005+p.phase);
+    ctx.beginPath();
+    ctx.arc(x,y,2.3,0,Math.PI*2);
+    ctx.fillStyle=(p.color==="cyan")?`rgba(0,255,255,${alpha})`:`rgba(255,70,100,${alpha})`;
+    ctx.fill();
+  }
+  requestAnimationFrame(animate);
+}
+animate();
+
+// click toggles music
+canvas.addEventListener("click",()=>{
+  if(song.paused){ song.play(); showLabel("PAUSE MUSIC"); }
+  else { song.pause(); showLabel("PLAY MUSIC"); }
+});
+
+function showLabel(txt){
+  label.textContent=txt;
+  label.classList.add("show");
+  setTimeout(()=>label.classList.remove("show"),3000);
+}
+</script>
+
+
+<style>
   .carousel-video {
     width: 100%;
     height: 100%;
