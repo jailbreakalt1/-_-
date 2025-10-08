@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Heart + R and T Particles Enhanced</title>
+<style>
+  body { margin:0; background:#111; height:100vh; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+  canvas { cursor:pointer; display:block; }
+</style>
+</head>
+<body>
+<canvas id="heartCanvas"></canvas>
+
+<audio id="song" autoplay src="images/Pink Sweat_ - At My Worst (feat. Kehlani) [Official Video] [K_zylJH4PRI].mp3"></audio>
+
+<script>
+const canvas = document.getElementById("heartCanvas");
+const ctx = canvas.getContext("2d");
+
+let cx, cy;
+let particles = [];
+let ripples = [];
+
+const PARTICLES = 800;
+const SIZE = 15;
+const DURATION = 8000;
+
+function heartPoint(t, scale=SIZE) {
+  let x = 16*Math.pow(Math.sin(t),3);
+  let y = 13*Math.cos(t) - 5*Math.cos(2*t) - 2*Math.cos(3*t) - Math.cos(4*t);
+  return {x:x*scale, y:-y*scale};
+}
+
+function randomStart() {
+  const side = Math.floor(Math.random()*4);
+  const w = canvas.width, h = canvas.height, m = 200;
+  if (side===0) return {x:Math.random()*w,y:-m};
+  if (side===1) return {x:w+m,y:Math.random()*h};
+  if (side===2) return {x:Math.random()*w,y:h+m};
+  return {x:-m,y:Math.random()*h};
+}
+
+function addLetterParticles(letter, x, y, color) {
+  const letterCanvas = document.createElement("canvas");
+  const lctx = letterCanvas.getContext("2d");
+  letterCanvas.width = 400;
+  letterCanvas.height = 400;
+  lctx.font = "bold 160px Arial";
+  lctx.textAlign = "center";
+  lctx.textBaseline = "middle";
+  lctx.fillText(letter, 200, 200);
+  const data = lctx.getImageData(0, 0, 400, 400).data;
+
+  for (let i = 0; i < 400; i += 4) {
+    for (let j = 0; j < 400; j += 4) {
+      const idx = (j * 400 + i) * 4 + 3;
+      if (data[idx] > 128 && Math.random() < 0.3) {
+        let start = randomStart();
+        particles.push({
+          sx:start.x, sy:start.y,
+          tx:x + i - 200, ty:y + j - 200,
+          color:color,
+          delay:Math.random()*DURATION*0.5,
+          time:DURATION*(0.5+Math.random()*0.5),
+          phase:Math.random()*Math.PI*2
+        });
+      }
+    }
+  }
+}
+
+function generateParticles() {
+  particles = [];
+  cx = canvas.width / 2;
+  cy = canvas.height / 2;
+
+  // Heart
+  for (let i = 0; i < PARTICLES; i++) {
+    let t = Math.random() * Math.PI * 2;
+    let outline = heartPoint(t);
+    let s = Math.pow(Math.random(), 0.5);
+    let target = { x: outline.x * s, y: outline.y * s };
+    let start = randomStart();
+    particles.push({
+      sx: start.x, sy: start.y,
+      tx: cx + target.x, ty: cy + target.y,
+      color: Math.random() > 0.5 ? "cyan" : "red",
+      delay: Math.random() * DURATION * 0.5,
+      time: DURATION * (0.5 + Math.random() * 0.5),
+      phase: Math.random() * Math.PI * 2,
+      type: "heart"
+    });
+  }
+
+  // R bottom-right (red)
+  addLetterParticles("R", canvas.width - 200, canvas.height - 200, "red");
+  // T top-left (cyan)
+  addLetterParticles("T", 200, 200, "cyan");
+}
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  generateParticles();
+}
+
+window.addEventListener("resize", resizeCanvas);
+resizeCanvas();
+
+// Ripple on click / hover
+canvas.addEventListener("pointermove", e => {
+  ripples.push({x:e.clientX, y:e.clientY, r:0, max:150});
+});
+canvas.addEventListener("click", e => {
+  ripples.push({x:e.clientX, y:e.clientY, r:0, max:300});
+});
+
+// Sparkles
+function randomSparkle() {
+  let p = particles[Math.floor(Math.random()*particles.length)];
+  if(p) {
+    ripples.push({x:p.tx, y:p.ty, r:0, max:100});
+  }
+  setTimeout(randomSparkle, 400 + Math.random()*400);
+}
+randomSparkle();
+
+let startTime=null;
+function animate(time){
+  if(!startTime) startTime=time;
+  let elapsed=time-startTime;
+
+  // Trail / glow effect
+  ctx.fillStyle = "rgba(0,0,0,0.25)";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  // Pulsating heartbeat
+  const heartPulse = 1 + Math.sin(time * 0.0015) * 0.05;
+
+  // Particles
+  for(let p of particles){
+    let local=elapsed-p.delay;
+    let prog=Math.min(Math.max(local/p.time,0),1);
+    let ease=1-Math.pow(1-prog,3);
+    let x=p.sx+(p.tx-p.sx)*ease;
+    let y=p.sy+(p.ty-p.sy)*ease;
+    if (prog >= 1) {
+      let pulse = p.type === "heart" ? heartPulse : 1;
+      x = (p.tx - cx) * pulse + cx + Math.sin(time * 0.005 + p.phase) * 1.5;
+      y = (p.ty - cy) * pulse + cy + Math.cos(time * 0.004 + p.phase) * 1.5;
+    }
+    let alpha=0.7+0.3*Math.sin(time*0.005+p.phase);
+    ctx.beginPath();
+    ctx.arc(x,y,2.3,0,Math.PI*2);
+    ctx.fillStyle=(p.color==="cyan")?`rgba(0,255,255,${alpha})`:`rgba(255,70,100,${alpha})`;
+    ctx.fill();
+  }
+
+  // Ripples (hover/click + sparkles)
+  for(let i=ripples.length-1;i>=0;i--){
+    let r=ripples[i];
+    r.r += 3;
+    let a = 1 - r.r/r.max;
+    if(a <= 0) ripples.splice(i,1);
+    else {
+      ctx.beginPath();
+      ctx.arc(r.x,r.y,r.r,0,Math.PI*2);
+      ctx.strokeStyle=`rgba(255,255,255,${a*0.4})`;
+      ctx.lineWidth=2;
+      ctx.stroke();
+    }
+  }
+
+  requestAnimationFrame(animate);
+}
+animate();
+
+// --- SLIDE HINT + PAGE TRANSITION --- //
+let heartFormed = false;
+let hintShown = false;
+let startX = 0;
+
+// detect when heart animation completes
+setTimeout(() => { 
+  heartFormed = true; 
+}, DURATION + 2000); // after heart finishes forming
+
+// hint text setup
+const hint = document.createElement("div");
+hint.textContent = "↔️ Slide across the heart";
+Object.assign(hint.style, {
+  position: "fixed",
+  bottom: "10%",
+  width: "100%",
+  textAlign: "center",
+  color: "#fff",
+  fontSize: "1.2em",
+  opacity: "0",
+  transition: "opacity 1s ease",
+  fontFamily: "Arial, sans-serif",
+  letterSpacing: "1px"
+});
+document.body.appendChild(hint);
+
+function showHint() {
+  if (heartFormed && !hintShown) {
+    hint.style.opacity = "1";
+    hintShown = true;
+  }
+}
+setTimeout(showHint, DURATION + 2500); // show hint shortly after heart forms
+
+// swipe detection
+canvas.addEventListener("touchstart", e => {
+  if (!heartFormed) return;
+  startX = e.touches[0].clientX;
+});
+
+canvas.addEventListener("touchend", e => {
+  if (!heartFormed) return;
+  const diffX = e.changedTouches[0].clientX - startX;
+  if (Math.abs(diffX) > 100) { //swipe threshold
+    hint.style.opacity = "0";
+    setTimeout(() => {
+      window.location.href = "page2.html"; //second HTML file
+    }, 500);
+  }
+});
+</script>
+</body>
+</html>
