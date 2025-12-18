@@ -5,210 +5,148 @@
   <title>to Trish🌹 from Ryan</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <link rel="stylesheet" href="./style.css">
- <style>
-  .carousel-video,
-  .carousel-box img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    cursor: zoom-in;
-  }
 
-  .carousel-box {
-    position: relative;
-    overflow: hidden;
-  }
+  <style>
+    .carousel-video,
+    .carousel-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      cursor: zoom-in;
+    }
 
-  /* Enlarged media */
-  .enlarged {
-    position: fixed !important;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(1.3);
-    max-width: 90vw;
-    max-height: 90vh;
-    z-index: 3000;
-    cursor: zoom-out;
-    transition: transform 0.3s ease;
-  }
+    .carousel-box {
+      position: relative;
+      overflow: hidden;
+    }
 
-  /* Blur everything except enlarged item */
-  body.media-active .carousel,
-  body.media-active .layout {
-    filter: blur(6px);
-    transition: filter 0.3s ease;
-  }
-</style>
+    /* Enlarged media */
+    .enlarged {
+      position: fixed !important;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(1.3);
+      max-width: 90vw;
+      max-height: 90vh;
+      z-index: 3000;
+      cursor: zoom-out;
+      transition: transform 0.3s ease;
+      pointer-events: auto;
+    }
 
+    /* Blur background */
+    body.media-active .carousel,
+    body.media-active .layout {
+      filter: blur(6px);
+      transition: filter 0.3s ease;
+    }
+  </style>
 </head>
-   <body>
+
+<body>
 
 <audio id="song" autoplay loop src="images/intensions.mp3"></audio>
-    
+
 <div class="carousel">
-  <div class="carousel-item">
-    <div class="carousel-box">
-      <div class="title">babe🌹</div>
-      <div class="num">01</div>
-      <img src="./images/inblue.jpg" />
-    </div>
-  </div>
 
-  <div class="carousel-item">
-    <div class="carousel-box">
-      <div class="title">I want to tell you Something😶</div>
-      <div class="num">02</div>
-       <img src="./images/y.jpg" />
-    </div>
-  </div>
-
-  <div class="carousel-item">
-    <div class="carousel-box">
-      <div class="title">Please Keep Dragging😶‍🌫️</div>
-      <div class="num">03</div>
-      <img src="images/inpink.jpg" />
-    </div>
-  </div>
-
-  <div class="carousel-item">
-    <div class="carousel-box">
-      <div class="title">You are Amazing🤩</div>
-      <div class="num">04</div>
-      <img src="./images/1.jpg" />
-    </div>
-  </div>
-
-  <div class="carousel-item">
-    <div class="carousel-box">
-      <div class="title">Most Beautiful Person on Earth💯</div>
-      <div class="num">05</div>
-      <img src="./images/2.jpg" />
-    </div>
-  </div>
-
-  <div class="carousel-item">
-    <div class="carousel-box">
-      <div class="title">And Cutest🎀</div>
-      <div class="num">06</div>
-      <img src="./images/3.jpg" />
-    </div>
-  </div>
-
-  <div class="carousel-item">
-    <div class="carousel-box">
-      <div class="title">And Since I met You🫠</div>
-      <div class="num">07</div>
-      <img src="./images/4.png" />
-    </div>
-  </div>
-
-  <div class="carousel-item">
-    <div class="carousel-box">
-      <div class="title">I feel very Lucky Everyday😇</div>
-      <div class="num">08</div>
-      <img src="./images/5.jpg" />
-    </div>
-  </div>
+  <!-- SLIDES -->
+  <div class="carousel-item"><div class="carousel-box"><div class="title">babe🌹</div><div class="num">01</div><img src="./images/inblue.jpg"></div></div>
+  <div class="carousel-item"><div class="carousel-box"><div class="title">I want to tell you Something😶</div><div class="num">02</div><img src="./images/y.jpg"></div></div>
+  <div class="carousel-item"><div class="carousel-box"><div class="title">Please Keep Dragging😶‍🌫️</div><div class="num">03</div><img src="./images/inpink.jpg"></div></div>
+  <div class="carousel-item"><div class="carousel-box"><div class="title">You are Amazing🤩</div><div class="num">04</div><img src="./images/1.jpg"></div></div>
+  <div class="carousel-item"><div class="carousel-box"><div class="title">Most Beautiful Person on Earth💯</div><div class="num">05</div><img src="./images/2.jpg"></div></div>
+  <div class="carousel-item"><div class="carousel-box"><div class="title">And Cutest🎀</div><div class="num">06</div><img src="./images/3.jpg"></div></div>
+  <div class="carousel-item"><div class="carousel-box"><div class="title">And Since I met You🫠</div><div class="num">07</div><img src="./images/4.png"></div></div>
+  <div class="carousel-item"><div class="carousel-box"><div class="title">I feel very Lucky Everyday😇</div><div class="num">08</div><img src="./images/5.jpg"></div></div>
 
   <div class="carousel-item">
     <div class="carousel-box">
       <div class="title">ur my peace, my joy ,my everything💖</div>
       <div class="num">09</div>
       <video class="carousel-video" autoplay loop muted playsinline>
-          <source src="./images/t.mp4" type="video/mp4">
-        </video>
+        <source src="./images/t.mp4" type="video/mp4">
+      </video>
     </div>
   </div>
 
-  <div class="carousel-item">
-    <div class="carousel-box">
-      <div class="title">Happy🎈birthday</div>
-      <div class="num">10</div>
-      <img src="./images/7.jpg" />
-    </div>
-  </div>
+  <div class="carousel-item"><div class="carousel-box"><div class="title">Happy🎈birthday</div><div class="num">10</div><img src="./images/7.jpg"></div></div>
+  <div class="carousel-item"><div class="carousel-box"><div class="title">my forever💞</div><div class="num">11</div><img src="./images/n.jpg"></div></div>
+  <div class="carousel-item"><div class="carousel-box"><div class="title">I love You♥️</div><div class="num">12</div><img src="./images/bride.png"></div></div>
 
-  <div class="carousel-item">
-    <div class="carousel-box">
-      <div class="title">my forever💞</div>
-      <div class="num">11</div>
-      <img src="./images/n.jpg" />
-    </div>
-  </div>
-
-  <div class="carousel-item">
-    <div class="carousel-box">
-      <div class="title">I love You♥️</div>
-      <div class="num">12</div>
-      <img src="./images/bride.png" />
-    </div>
-  </div>
-
-<div class="carousel-item">
-  <div class="carousel-box">
-    <div class="tittle">BIRTHDAY CAKE</div>
-    <div class="num">13</div>
-    <img src="https://mega.nz/file/PRFykbQC#ctgDjBeYyo2qAVuyKWdS9mWodrwMoBoF8MXUPWNtCLw" />
-  </div>
 </div>
-  
-</div> <div class="layout">
-  <div class="box">this isn't much <br/>buhh "simplicity is the key to happiness"<br/>right?</div>
+
+<div class="layout">
+  <div class="box">
+    this isn't much <br>
+    buhh "simplicity is the key to happiness"<br>
+    right?
+  </div>
 </div>
 
 <div class="cursor"></div>
 <div class="cursor cursor2"></div>
 
+<script src="./script.js"></script>
+
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const mediaItems = document.querySelectorAll(
-      ".carousel-box img, .carousel-box video"
-    )
+document.addEventListener("DOMContentLoaded", () => {
+  const mediaItems = document.querySelectorAll(
+    ".carousel-box img, .carousel-box video"
+  )
 
-    let lastTap = 0
+  let lastTap = 0
+  let zoomedItem = null
 
-    const toggleEnlarge = (e, item) => {
-      e.stopPropagation()
+  const openMedia = (item) => {
+    closeMedia()
+    zoomedItem = item
+    item.classList.add("enlarged")
+    document.body.classList.add("media-active")
+  }
+
+  const closeMedia = () => {
+    if (!zoomedItem) return
+    zoomedItem.classList.remove("enlarged")
+    document.body.classList.remove("media-active")
+    zoomedItem = null
+  }
+
+  mediaItems.forEach(item => {
+    // Desktop double-click
+    item.addEventListener("dblclick", e => {
       e.preventDefault()
-
-      const isEnlarged = item.classList.contains("enlarged")
-
-      document
-        .querySelectorAll(".enlarged")
-        .forEach(el => el.classList.remove("enlarged"))
-
-      if (!isEnlarged) {
-        item.classList.add("enlarged")
-        document.body.classList.add("media-active")
-      } else {
-        document.body.classList.remove("media-active")
-      }
-    }
-
-    mediaItems.forEach(item => {
-      // Desktop double-click
-      item.addEventListener("dblclick", e => toggleEnlarge(e, item))
-
-      // Mobile double-tap
-      item.addEventListener("touchend", e => {
-        const now = Date.now()
-        if (now - lastTap < 300) {
-          toggleEnlarge(e, item)
-        }
-        lastTap = now
-      })
+      e.stopPropagation()
+      openMedia(item)
     })
 
-    // Click outside to close
-    document.addEventListener("click", () => {
-      document
-        .querySelectorAll(".enlarged")
-        .forEach(el => el.classList.remove("enlarged"))
-      document.body.classList.remove("media-active")
+    // Mobile double-tap
+    item.addEventListener("touchend", e => {
+      const now = Date.now()
+      if (now - lastTap < 300) {
+        e.preventDefault()
+        openMedia(item)
+      }
+      lastTap = now
+    })
+
+    // Click enlarged media to close
+    item.addEventListener("click", e => {
+      if (!item.classList.contains("enlarged")) return
+      e.stopPropagation()
+      closeMedia()
     })
   })
-</script>
 
+  // Block carousel drag when zoomed
+  document.addEventListener("mousedown", e => {
+    if (zoomedItem) e.stopPropagation()
+  }, true)
+
+  document.addEventListener("touchstart", e => {
+    if (zoomedItem) e.stopPropagation()
+  }, true)
+})
+</script>
 
 </body>
 </html>
