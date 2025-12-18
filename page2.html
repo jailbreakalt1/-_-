@@ -5,38 +5,41 @@
   <title>to Trish🌹 from Ryan</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <link rel="stylesheet" href="./style.css">
-  <style>
-    .carousel-video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      position: absolute;
-      top: 0;
-      left: 0;
-    }
+ <style>
+  .carousel-video,
+  .carousel-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    cursor: zoom-in;
+  }
 
-    .carousel-box {
-      position: relative;
-      overflow: hidden;
-    }
+  .carousel-box {
+    position: relative;
+    overflow: hidden;
+  }
 
-    /* CSS for the enlarged view */
-    .enlarged {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(1.5);
-      z-index: 2000;
-      transition: transform 0.3s ease, z-index 0.3s ease;
-      cursor: zoom-out;
-    }
+  /* Enlarged media */
+  .enlarged {
+    position: fixed !important;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(1.3);
+    max-width: 90vw;
+    max-height: 90vh;
+    z-index: 3000;
+    cursor: zoom-out;
+    transition: transform 0.3s ease;
+  }
 
-    /* Add a blurred background */
-    .blur-bg {
-      filter: blur(5px);
-      transition: filter 0.3s ease;
-    }
-  </style>
+  /* Blur everything except enlarged item */
+  body.media-active .carousel,
+  body.media-active .layout {
+    filter: blur(6px);
+    transition: filter 0.3s ease;
+  }
+</style>
+
 </head>
    <body>
 
@@ -156,29 +159,56 @@
 <div class="cursor"></div>
 <div class="cursor cursor2"></div>
 
-<script src="./script.js"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => {
-    const carouselItems = document.querySelectorAll(".carousel-box img, .carousel-box video"); // Target images and videos
-    const carousel = document.querySelector(".carousel"); // Target carousel for background blur
+    const mediaItems = document.querySelectorAll(
+      ".carousel-box img, .carousel-box video"
+    )
 
-    carouselItems.forEach(item => {
-      item.addEventListener("dblclick", (e) => {
-        const isEnlarged = item.classList.contains("enlarged");
+    let lastTap = 0
 
-        // Toggle "enlarged" class on double-click
-        item.classList.toggle("enlarged");
+    const toggleEnlarge = (e, item) => {
+      e.stopPropagation()
+      e.preventDefault()
 
-        // Add/remove "blur-bg" class on the carousel
-        if (!isEnlarged) {
-          carousel.classList.add("blur-bg");
-        } else {
-          carousel.classList.remove("blur-bg");
+      const isEnlarged = item.classList.contains("enlarged")
+
+      document
+        .querySelectorAll(".enlarged")
+        .forEach(el => el.classList.remove("enlarged"))
+
+      if (!isEnlarged) {
+        item.classList.add("enlarged")
+        document.body.classList.add("media-active")
+      } else {
+        document.body.classList.remove("media-active")
+      }
+    }
+
+    mediaItems.forEach(item => {
+      // Desktop double-click
+      item.addEventListener("dblclick", e => toggleEnlarge(e, item))
+
+      // Mobile double-tap
+      item.addEventListener("touchend", e => {
+        const now = Date.now()
+        if (now - lastTap < 300) {
+          toggleEnlarge(e, item)
         }
-      });
-    });
-  });
+        lastTap = now
+      })
+    })
+
+    // Click outside to close
+    document.addEventListener("click", () => {
+      document
+        .querySelectorAll(".enlarged")
+        .forEach(el => el.classList.remove("enlarged"))
+      document.body.classList.remove("media-active")
+    })
+  })
 </script>
+
 
 </body>
 </html>
