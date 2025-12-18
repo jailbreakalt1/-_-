@@ -5,24 +5,40 @@
   <title>to Trish🌹 from Ryan</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <link rel="stylesheet" href="./style.css">
+  <style>
+    .carousel-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    .carousel-box {
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* CSS for the enlarged view */
+    .enlarged {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(1.5);
+      z-index: 2000;
+      transition: transform 0.3s ease, z-index 0.3s ease;
+      cursor: zoom-out;
+    }
+
+    /* Add a blurred background */
+    .blur-bg {
+      filter: blur(5px);
+      transition: filter 0.3s ease;
+    }
+  </style>
 </head>
    <body>
-
-<style>
-  .carousel-video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    position: absolute;
-    top: 0;
-    left: 0;
-  }
-
-  .carousel-box {
-    position: relative;
-    overflow: hidden;
-  }
-</style>     
 
 <audio id="song" autoplay loop src="images/intensions.mp3"></audio>
     
@@ -141,6 +157,28 @@
 <div class="cursor cursor2"></div>
 
 <script src="./script.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const carouselItems = document.querySelectorAll(".carousel-box img, .carousel-box video"); // Target images and videos
+    const carousel = document.querySelector(".carousel"); // Target carousel for background blur
+
+    carouselItems.forEach(item => {
+      item.addEventListener("dblclick", (e) => {
+        const isEnlarged = item.classList.contains("enlarged");
+
+        // Toggle "enlarged" class on double-click
+        item.classList.toggle("enlarged");
+
+        // Add/remove "blur-bg" class on the carousel
+        if (!isEnlarged) {
+          carousel.classList.add("blur-bg");
+        } else {
+          carousel.classList.remove("blur-bg");
+        }
+      });
+    });
+  });
+</script>
 
 </body>
 </html>
